@@ -1,8 +1,11 @@
+from contextlib import nullcontext
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
 #quero usar o banco de dados nesse arquivo, usando o formato sqlite
-engine = create_engine('sqlite:///D:/Developer/Impacta/Semestre3/Desenvolvimento de APIs e Microsserviços/Python/Unidade 01/Parte 02/biblioteca.db')
+engine = create_engine(
+    'sqlite:///D:/Developer/Impacta/Semestre3/Desenvolvimento de APIs e Microsserviços/Python/Unidade 01/Parte 02/biblioteca.db'
+)
 
 #mas se quisesse uma solução mais robusta, poderia
 #usar mudando o código muito pouco
@@ -96,10 +99,11 @@ def consulta_aluno(id_aluno):
 #1b) Crie uma função todos_alunos que retorna um lista com um dicionario
 # para cada aluno
 
+
 def todos_alunos():
     list_dictionary = list()
     dic = dict()
-    
+
     with engine.connect() as con:
         sql_consulta = text("SELECT * FROM aluno")
         result_all = con.execute(sql_consulta)
@@ -110,11 +114,13 @@ def todos_alunos():
             list_dictionary.append(dict(tupla))
     return list_dictionary
 
+
 # print(todos_alunos())
 # print(consulta_aluno(1))
 
 #1c) Crie uma função todos_livros que retorna um lista com um dicionario
 # para cada livro
+
 
 def todos_os_itens(tipo):
     list_dictionary = list()
@@ -128,22 +134,84 @@ def todos_os_itens(tipo):
             list_dictionary.append(dict(tupla))
     return list_dictionary
 
-print(todos_os_itens("livro"))
-print(todos_os_itens("aluno"))
+
+# print(todos_os_itens("livro"))
+# print(todos_os_itens("aluno"))
 
 # 2) Crie uma função cria livro que recebe os dados de um livro (id e descrição)
 # e o adiciona no banco de dados
 
 
+def criar_livro(id_livro, id_aluno="Null", description=''):
+    with engine.connect() as con:
+        add_book = f"INSERT INTO Livro (id_livro, id_aluno, descricao) VALUES({id_livro}, {id_aluno}, '{description}')"
+        # add_livro = "INSERT INTO Livro (id_livro, id_aluno, descricao) VALUES (3,2,'Gravidade')"
+        con.execute(add_book)
+
+
+# criar_livro(id_livro=8, description='Senhor dos aneis')
 
 # 3) Crie uma função empresta_livro, que recebe a id de um livro, a id de um aluno
 # e marca o livro como emprestado pelo aluno
 
+
+def empresta_livro(id_livro, id_aluno):
+    with engine.connect() as con:
+        lend_book = f"UPDATE Livro SET id_aluno = {id_aluno} WHERE id_livro = {id_livro}"
+        con.execute(lend_book)
+
+
 # 4) Crie uma função devolve_livro, que recebe a id de um livro, e marca o livro
 # como disponível
+
+
+def devolve_livro(id_livro):
+    with engine.connect() as con:
+        free_book = f"UPDATE Livro SET id_aluno = Null WHERE id_livro = {id_livro}"
+        con.execute(free_book)
+
 
 # 5) Crie uma função livros_parados que devolve a lista de todos os livros que não estão emprestados
 # por ninguém (uma lista de dicionários, um para cada livro)
 
+
+def livros_parados():
+    list_dictionary = []
+    # todos_os_livros = todos_os_itens('livro')
+    # for livro in todos_os_livros:
+    #     if livro['id_aluno'] == None:
+    #         list_books.append(livro)
+    with engine.connect() as con:
+        free_books = f"SELECT * FROM 'livro' WHERE id_aluno ISNULL"
+        rs = con.execute(free_books)
+        while True:
+            tupla = rs.fetchone()
+            if tupla == None:
+                break
+            list_dictionary.append(dict(tupla))
+    return list_dictionary
+
+
 # 6) Crie uma função livros_do_aluno, recebe o nome do aluno e devolve a lista de todos
 # os livros que estão com o aluno no momento
+
+
+def livros_do_aluno(nome_aluno):
+    book_list = []
+    with engine.connect() as con:
+        # books = f"SELECT * FROM Livro Join Aluno On id_aluno = id WHERE nome = '{nome_aluno}'"
+        books = f"SELECT l.id_livro, l.id_aluno, l.descricao FROM Aluno AS a JOIN Livro as l ON a.id = l.id_aluno WHERE a.nome = '{nome_aluno}'"
+        rs = con.execute(books)
+        while True:
+            tupla = rs.fetchone()
+            if tupla == None:
+                break
+            book_list.append(dict(tupla))
+    return book_list
+
+
+# empresta_livro(2, 2)
+# devolve_livro(1)
+# print(todos_os_itens("livro"))
+# print(livros_parados())
+print(livros_do_aluno('Helena O. S.'))
