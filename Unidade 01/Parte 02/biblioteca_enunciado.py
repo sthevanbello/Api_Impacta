@@ -145,7 +145,6 @@ def todos_os_itens(tipo):
 def criar_livro(id_livro, id_aluno="Null", description=''):
     with engine.connect() as con:
         add_book = f"INSERT INTO Livro (id_livro, id_aluno, descricao) VALUES({id_livro}, {id_aluno}, '{description}')"
-        # add_livro = "INSERT INTO Livro (id_livro, id_aluno, descricao) VALUES (3,2,'Gravidade')"
         con.execute(add_book)
 
 
@@ -157,8 +156,8 @@ def criar_livro(id_livro, id_aluno="Null", description=''):
 
 def empresta_livro(id_livro, id_aluno):
     with engine.connect() as con:
-        lend_book = f"UPDATE Livro SET id_aluno = {id_aluno} WHERE id_livro = {id_livro}"
-        con.execute(lend_book)
+        lend_book = f"UPDATE Livro SET id_aluno = :id_aluno WHERE id_livro = :id_livro"
+        con.execute(lend_book, id_aluno = id_aluno, id_livro = id_livro)
 
 
 # 4) Crie uma função devolve_livro, que recebe a id de um livro, e marca o livro
@@ -210,8 +209,8 @@ def livros_do_aluno(nome_aluno):
     return book_list
 
 
-# empresta_livro(2, 2)
+# empresta_livro(1, 8)
 # devolve_livro(1)
-# print(todos_os_itens("livro"))
-# print(livros_parados())
-print(livros_do_aluno('Helena O. S.'))
+print(todos_os_itens("livro"))
+print(livros_parados())
+# print(livros_do_aluno('Helena O. S.'))
