@@ -93,7 +93,10 @@ def busca_por_tipo(nome, tipo_buscar):
     return dicionario_do_pedido
 
 def __busca(nome='', tipo='', id='', page=''):
-    url = f"http://www.omdbapi.com/?apikey={api_key}&s={nome}&type={tipo}&i={id}&page={page}"
+    if(id != ''):
+        url = f"http://www.omdbapi.com/?apikey={api_key}&i={id}"
+    else:
+        url = f"http://www.omdbapi.com/?apikey={api_key}&s={nome}&type={tipo}&page={page}"
     pedido = requests.get(url)
     dicionario_do_pedido = pedido.json()
     return dicionario_do_pedido
@@ -194,7 +197,7 @@ O dicionário deve ter as seguintes chaves:
 E os dados devem ser preenchidos baseado nos dados do site.
 '''
 def dicionario_do_filme_por_id(id_filme):
-    dic = dict()
+    dic = {}
     item = __busca(id = id_filme)
     dic = {
         'ano': item['Year'],
@@ -215,16 +218,25 @@ A sua resposta deve ser uma lista, cada filme representado por
 um dicionário. cada dicionario deve conter os campos
 'nome' (valor Title da resposta) e 'ano' (valor Year da resposta).
 '''
+# def busca_filmes(texto_buscar):
+#     lista = []
+#     filmes = __busca(nome=texto_buscar)
+#     for pos in range(0,10):
+#         lista.append({
+#             'Name': filmes['Search'][pos]['Title'],
+#             'Year': filmes['Search'][pos]['Year']
+#             }
+#         )
+#     return lista
+
 def busca_filmes(texto_buscar):
-    lista = list()
-    dic = dict()
+    lista = []
     filmes = __busca(nome=texto_buscar)
     for pos in range(0,10):
-        lista.append({
-            'Name': filmes['Search'][pos]['Title'],
-            'Year': filmes['Search'][pos]['Year']
-            }
-        )
+        dic = {}
+        dic['Name'] = filmes['Search'][pos]['Title']
+        dic['Year'] = filmes['Search'][pos]['Year']
+        lista.append(dic)
     return lista
 '''
 Faça uma função busca_filmes_grande que, dada uma busca, retorna
@@ -246,7 +258,6 @@ def busca_qtd_personalizada(texto_buscar, quantidade):
     lista = list()
     dic = dict()
     pages = 1
-    # total = busca_qtd_total(texto_buscar)
     if quantidade > 10:
         pages = math.ceil(quantidade / 10)
     for page in range(1,pages+1):
@@ -263,3 +274,4 @@ def busca_qtd_personalizada(texto_buscar, quantidade):
 
 # print(busca_filmes('star wars'))
 # print(busca_qtd_personalizada('star wars', 15))
+# print(dicionario_do_filme_por_id('tt3778644'))
