@@ -46,6 +46,10 @@ def deletar(id_pessoa):
         del pessoas[id_pessoa]
     return pessoas
 
+@app.route("/pessoas", methods = ["GET"])
+def todos():
+    return pessoas
+
 if __name__ == "__main__":
     app.run(host = "localhost", port = 5002)
 

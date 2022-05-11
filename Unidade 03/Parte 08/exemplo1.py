@@ -10,7 +10,7 @@ cores_frutas = {
     "limão": "verde"
 }
 
-@app.route("/frutas/<nome_fruta>/cor")
+@app.route("/frutas/<nome_fruta>/<teste>/cor")
 def frutas(nome_fruta):
     if nome_fruta in cores_frutas:
         return cores_frutas[nome_fruta]
